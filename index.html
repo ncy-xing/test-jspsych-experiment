@@ -1,23 +1,75 @@
 <!DOCTYPE html>
 <html>
-    <head>jsPsych Demo
+    <head>
+        <title>jsPsych Demo</title>
         <!--imports-->
         <script src="https://unpkg.com/jspsych@7.3.0"></script>
-
         <script src="https://unpkg.com/@jspsych/plugin-html-keyboard-response@1.1.1"></script>
+        <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@1.1.1"></script>
+        <!--Style sheet import (ie making prompt show in center of screen)-->
+        <link href="https://unpkg.com/jspsych@7.3.0/css/jspsych.css" rel="stylesheet" type="text/css" />
     </head>
     <body>
         <script>
-            const jsPsych = initJsPsych();
+            // Each screen of the experiment is a new plugin you need to define below the previous plugin
+
+            var jsPsych = initJsPsych({
+                on_finish: function(){ 
+                    jsPsych.data.displayData(); // Added data display after trial for testing
+                }
+            });
             
-            const hello_trial = {
-                type: jsPsychHtmlKeyboardResponse, //what kind of screen you want to create/the plugin type
-                stimulus: 'Hello world!',
-                choices: ['Y','N'], //restricts choices--stim dissapears when you press a Y or an N
-                stimulus_duration: 500
+            // CONSTANT EXAMPLE
+            // const hello_trial = {
+            //     type: jsPsychHtmlKeyboardResponse, //what kind of screen you want to create/the plugin type
+            //     stimulus: 'Hello world!',
+            //     choices: "NO_KEYS", //restricts choices--stim dissapears when you press a Y or an N
+            //     stimulus_duration: 500,
+            //     prompt: 'Press Y or N',
+            //     trial_duration: 2000
+            // }
+
+            // FIXATION 1: +
+            var fixation1 = {
+                type: jsPsychHtmlKeyboardResponse,
+                //formatting stimulus font. Remember to close the entire thing in string quotes. The original '+'
+                //no longer needs string quotes around it.
+                stimulus: '<p style="font-size : 48px">+</p>',
+                choices: "NO_KEYS",
+                trial_duration: 1000
             }
             
-            jsPsych.run([hello_trial]);
+            // SENTENCE
+            var sentence = {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: 'You dropped a balloon on a vase.',
+                choices: " " //spacebar entry
+            }
+            
+            // FIXATION 2
+            var fixation2 = {
+                type: jsPsychHtmlKeyboardResponse,
+                //formatting stimulus font. Remember to close the entire thing in string quotes. The original '+'
+                //no longer needs string quotes around it.
+                stimulus: '<p style="font-size : 48px">+</p>',
+                choices: "NO_KEYS",
+                trial_duration: 500
+            }
+            
+            // IMAGE
+            var picture = {
+                type: jsPsychImageKeyboardResponse,
+                stimulus: "snail.png",
+                choices: ['S', 'N', 's', 'n']
+            }
+            
+            // END SCREEN
+            var end_experiment = {
+                type: jsPsychHtmlKeyboardResponse,
+                stimulus: "Thank you for participating! Click any key to end the experiment."
+            }
+            // PLUGIN CALLS. Pass in the array of plugins to run. Remember to pass in all the plugins.
+            jsPsych.run([fixation1, sentence, fixation2, picture, end_experiment]);
         </script>
     </body>
 </html>
