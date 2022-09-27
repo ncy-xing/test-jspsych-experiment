@@ -8,6 +8,8 @@
         <script src="https://unpkg.com/@jspsych/plugin-image-keyboard-response@1.1.1"></script>
         <!--Style sheet import (ie making prompt show in center of screen)-->
         <link href="https://unpkg.com/jspsych@7.3.0/css/jspsych.css" rel="stylesheet" type="text/css" />
+        <!--Import stimuli-->
+        <script src="stimuli.js"></script>
     </head>
     <body>
         <script>
@@ -42,7 +44,7 @@
             // SENTENCE
             var sentence = {
                 type: jsPsychHtmlKeyboardResponse,
-                stimulus: 'You dropped a balloon on a vase.',
+                stimulus: jsPsych.timelineVariable('sentence'),
                 choices: " " //spacebar entry
             }
             
@@ -59,7 +61,7 @@
             // IMAGE
             var picture = {
                 type: jsPsychImageKeyboardResponse,
-                stimulus: "snail.png",
+                stimulus: jsPsych.timelineVariable('pic'),
                 choices: ['S', 'N', 's', 'n']
             }
             
@@ -69,7 +71,15 @@
                 stimulus: "Thank you for participating! Click any key to end the experiment."
             }
             // PLUGIN CALLS. Pass in the array of plugins to run. Remember to pass in all the plugins.
-            jsPsych.run([fixation1, sentence, fixation2, picture, end_experiment]);
+            var experiment_procedure = {
+                timeline: [fixation1, sentence, fixation2, picture], // The events we defined
+                timeline_variables: stimuli, // some of the events have stimuli we need to pull from here
+                randomize_order: true // rando order shown to participants
+            };
+            jsPsych.run([experiment_procedure]);
+
+            // Use timeslines to repeat trials per participant
+            // supply excel/csv items by using paths where you define the stimuli
         </script>
     </body>
 </html>
