@@ -10,6 +10,11 @@
         <link href="https://unpkg.com/jspsych@7.3.0/css/jspsych.css" rel="stylesheet" type="text/css" />
         <!--Import stimuli-->
         <script src="stimuli.js"></script>
+        <!--Import lists-->
+        <script src="list1.js"></script>
+        <script src="list2.js"></script>
+        <script src="list3.js"></script>
+        <script src="list4.js"></script>
     </head>
     <body>
         <script>
@@ -30,7 +35,10 @@
             //     prompt: 'Press Y or N',
             //     trial_duration: 2000
             // }
-
+            
+            //Generate a random user ID
+            var subject_id = Math.floor(Math.random()*100000);
+            
             // FIXATION 1: +
             var fixation1 = {
                 type: jsPsychHtmlKeyboardResponse,
@@ -38,14 +46,28 @@
                 //no longer needs string quotes around it.
                 stimulus: '<p style="font-size : 48px">+</p>',
                 choices: "NO_KEYS",
-                trial_duration: 1000
+                trial_duration: 1000,
+                // When fixation column appears, add the 
+                //specified data below to the written data file
+                data: {
+                typeoftrial: 'fixation',
+                list_number: jsPsych.timelineVariable('List'),
+                trialcondition: jsPsych.timelineVariable('condition'),
+                subject: subject_id
+                }
             }
             
             // SENTENCE
             var sentence = {
                 type: jsPsychHtmlKeyboardResponse,
                 stimulus: jsPsych.timelineVariable('sentence'),
-                choices: " " //spacebar entry
+                choices: " ", //spacebar entry
+                data: {
+                typeoftrial: 'sentence',
+                list_number: jsPsych.timelineVariable('List'),
+                trialcondition: jsPsych.timelineVariable('condition'),
+                subject: subject_id
+                }
             }
             
             // FIXATION 2
@@ -55,14 +77,26 @@
                 //no longer needs string quotes around it.
                 stimulus: '<p style="font-size : 48px">+</p>',
                 choices: "NO_KEYS",
-                trial_duration: 500
+                trial_duration: 500,
+                data: {
+                typeoftrial: 'fixation',
+                list_number: jsPsych.timelineVariable('List'),
+                trialcondition: jsPsych.timelineVariable('condition'),
+                subject: subject_id
+                }
             }
             
             // IMAGE
             var picture = {
                 type: jsPsychImageKeyboardResponse,
                 stimulus: jsPsych.timelineVariable('pic'),
-                choices: ['S', 'N', 's', 'n']
+                choices: ['S', 'N', 's', 'n'],
+                data: {
+                typeoftrial: 'picture',
+                list_number: jsPsych.timelineVariable('List'),
+                trialcondition: jsPsych.timelineVariable('condition'),
+                subject: subject_id
+                }
             }
             
             // END SCREEN
@@ -70,10 +104,27 @@
                 type: jsPsychHtmlKeyboardResponse,
                 stimulus: "Thank you for participating! Click any key to end the experiment."
             }
+            
+            // ASSIGN A LIST 
+            var list = [1,2,3,4];
+            // Og we did it randomly but now use cognition.run to create even dist of conditions
+            // var CONDITION = list[Math.floor(Math.random() * list.length)]; // rando selects a number from 1-4 
+            // Selects the list off of the random number
+            var teststimuli = [] 
+            if(CONDITION == 1){teststimuli = list1}
+            else if(CONDITION == 2){teststimuli = list2}
+            else if(CONDITION == 3){teststimuli = list3}
+            else{teststimuli = list4}
+            
+            // Test checks. Prints list, condition, and test stimuli to the html console. 
+            // console.log("list=", list)
+            // console.log("CONDITION=", CONDITION)
+            // console.log("teststimuli=", teststimuli)
+
             // PLUGIN CALLS. Pass in the array of plugins to run. Remember to pass in all the plugins.
             var experiment_procedure = {
                 timeline: [fixation1, sentence, fixation2, picture], // The events we defined
-                timeline_variables: stimuli, // some of the events have stimuli we need to pull from here
+                timeline_variables: teststimuli, // Now the random list 
                 randomize_order: true // rando order shown to participants
             };
             jsPsych.run([experiment_procedure]);
