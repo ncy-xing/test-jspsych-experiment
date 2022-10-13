@@ -1,0 +1,115 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options:
+  chunk_output_type: inline
+---
+
+# Install packages (only need once)
+```{r}
+# install.packages ("tidyverse", dependencies = TRUE)
+# install.packages("ggthemes", dependencies = TRUE)
+```
+
+# Import/Load packages 
+```{r}
+library(tidyverse)
+library(ggthemes)
+```
+# Import data
+```{r}
+exp1 = read_csv("exp1.csv")
+# exp1 is a dataframe format 
+nrow(exp1)
+ncol(exp1)
+
+colnames(exp1)
+hist(exp1$rt)
+```
+
+# tidyverse verbs
+
+```{r}
+condition_data = exp1 %>% 
+  select(subject, rt, typeoftrial, trialcondition, correct) %>%
+  group_by(trialcondition) %>% # split mean rt across conditions
+  filter(typeoftrial == "picture" &
+    trialcondition %in% # only filter pictures with the following trial condition
+    c("Heavy_Normal", "Light_Smashed", "Heavy_Smashed", "Light_Normal")) # c() is list 
+
+means = condition_data %>%
+  summarise(mean_rt = mean(rt), sd_rt = sd(rt), mean_acc = mean(correct)) 
+  # method calls stored in new columns
+
+
+```
+```{r}
+# matplotlib moment omg
+condition_data %>%
+filter(rt < 25000) %>% # control for outliers 
+  # everything after ggplot is a single weirdly formatted function call 
+ggplot(aes(x = rt)) +
+geom_histogram(binwidth = 1000,
+fill = "red", color = "black",
+position = "identity")+
+theme_few()+ # theme for pretty clear plot
+xlab("RT (in milliseconds)") +
+ylab ("Count")+
+ggtitle("Histogram of RT")
+
+# Plot of mean reaction time
+means %>%
+ggplot(aes(x = trialcondition, y = mean_rt)) +
+geom_bar(stat = "identity", fill="magenta")+
+theme_fivethirtyeight()+
+xlab("RT (in milliseconds)") +
+ylab ("Count")+
+ggtitle("Barplot of RT")
+```
+
+# practice verbiage
+```{r}
+# exp1 %>% # not stored in a var
+#   select(dataset, correct, typeoftrial) %>%
+#   filter(correct == 1 & typeoftrial == "picture")
+
+
+```
+# QUICKSTART: Basic pipeline for analyses
+- Install packages once with install.packages("name"). Check if packages are installed by typing its name into the console, eg library(stats)
+    Tidyverse is a collection of other packages (ggplot1, dplyr)
+- Load all packages with library(name)
+- Read the csv with read_csv(String name)
+- Save csv in the current directory with write_csv(data_frame, String filename)
+
+SYNTAX FUNCTIONS AND OPERATIONS
+- exp1 %>% operation %>%
+- item %in% c(element 1, element 2, element 3)
+- filter(field == something) for rows and select(field) for columns
+
+
+# Experiment 2
+```{r}
+df = read_csv("relatedness_exp.csv") # df is shorthand for data frame 
+
+# Creating a subset of df 
+part_df = exp2 %>% 
+  select(ID, Type, pathlength, RT) %>%
+  filter(Type == "Related" & (pathlength == 1 | pathlength == 2))
+
+# Create 3 data frames
+
+# The mean RT for the full dataset
+mean_all = df %>% 
+  summarize(mean = mean(RT))
+# The mean RT for the truncated dataset
+mean_part = part_df %>% 
+  summarize(mean = mean(RT))
+# Mean RT for each subject 
+mean_ID = df %>% 
+  group_by(ID) %>%
+  summarize(mean = mean(RT))
+
+# print("mean RT rows: ", nrow(mean_all) )
+```
+
